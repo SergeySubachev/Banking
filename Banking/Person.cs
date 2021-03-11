@@ -6,13 +6,15 @@ namespace Banking
     {
         public string Id { private set; get; }
         public double InitBalance { private set; get; }
+        public int SheetNumber { private set; get; }
         public int Row { private set; get; }
         public List<(int month, double sum)> Costs { private set; get; } = new List<(int, double)>();
 
-        public Person(string id, double initBalance, int row)
+        public Person(string id, double initBalance, int sheetNumber, int row)
         {
             Id = id;
             InitBalance = initBalance;
+            SheetNumber = sheetNumber;
             Row = row;
         }
     }

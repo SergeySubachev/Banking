@@ -14,8 +14,7 @@ namespace Banking
         static void Main(string[] args)
         {
             string filename1, filename2;
-            var ofd = new OpenFileDialog();
-            ofd.Title = "Открыть основной файл";
+            var ofd = new OpenFileDialog { Title = "Открыть основной файл" };
             if (ofd.ShowDialog() != DialogResult.OK)
                 return;
             filename1 = ofd.FileName;
@@ -32,57 +31,61 @@ namespace Banking
 
                 excelApp = new Microsoft.Office.Interop.Excel.Application();
                 var wb1 = excelApp.Workbooks.Open(filename1);
-                var sheet1 = (Microsoft.Office.Interop.Excel.Worksheet)wb1.Sheets.Item[1];
-                int row1 = 2;
-                string id = (sheet1.Cells[row1, 4] as Microsoft.Office.Interop.Excel.Range).Value2.ToString();
-                while (!string.IsNullOrWhiteSpace(id))
+                Console.WriteLine($"Количество вкладок основного файла: {wb1.Sheets.Count}.");
+                for (int i = 1; i <= wb1.Sheets.Count; i++)
                 {
-                    //Console.Out.WriteLine(row.ToString());
-                    if (persons.ContainsKey(id))
-                        Console.Out.WriteLine($"Ошибка. Повторение ID в основном файле: '{id}'");
-                    else
+                    Console.WriteLine($"Чтение вкладки {i}...");
+                    var sheet1 = (Microsoft.Office.Interop.Excel.Worksheet)wb1.Sheets.Item[i];
+                    int row1 = 3;
+                    string id = (sheet1.Cells[row1, 4] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString();
+                    while (!string.IsNullOrWhiteSpace(id))
                     {
-                        string balance = (sheet1.Cells[row1, 5] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString();
-                        double? initbalance = convertToDouble(balance);
-                        if (initbalance.HasValue)
-                            persons.Add(id, new Person(id, initbalance.Value, row1));
+                        if (persons.ContainsKey(id))
+                            Console.Out.WriteLine($"Ошибка. Повторение ID в основном файле: '{id}'. Строка {row1} пропускается.");
                         else
-                            Console.Out.WriteLine($"Ошибка. Не удалось прочитать баланс по ID '{id}'. Строка {row1}.");
+                        {
+                            string balance = (sheet1.Cells[row1, 5] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString();
+                            double? initbalance = convertToDouble(balance);
+                            if (initbalance.HasValue)
+                                persons.Add(id, new Person(id, initbalance.Value, i, row1));
+                            else
+                                Console.Out.WriteLine($"Ошибка. Не удалось прочитать баланс по ID '{id}'. Строка {row1}.");
+                        }
+                        row1++;
+                        id = (sheet1.Cells[row1, 4] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString();
                     }
-                    row1++;
-                    id = (sheet1.Cells[row1, 4] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString();
-                }
 
-                Console.Out.WriteLine($"Прочитано записей основного файла: {row1 - 1}\n");
+                    Console.Out.WriteLine($"Прочитано записей вкладки {i}: {row1 - 1}\n");
+                }
 
                 var wb2 = excelApp.Workbooks.Open(filename2);
                 var sheet2 = (Microsoft.Office.Interop.Excel.Worksheet)wb2.Sheets.Item[1];
                 int row2 = 2;
-                id = (sheet2.Cells[row2, 3] as Microsoft.Office.Interop.Excel.Range).Value2.ToString();
-                while (!string.IsNullOrWhiteSpace(id))
+                Console.WriteLine($"Чтение файла поступлений...");
+                string id2 = (sheet2.Cells[row2, 3] as Microsoft.Office.Interop.Excel.Range).Value2.ToString();
+                while (!string.IsNullOrWhiteSpace(id2))
                 {
-                    if (persons.ContainsKey(id))
+                    if (persons.ContainsKey(id2))
                     {
                         DateTime date = DateTime.FromOADate((double)(sheet2.Cells[row2, 4] as Microsoft.Office.Interop.Excel.Range).Value2);
                         double? cost = convertToDouble((sheet2.Cells[row2, 5] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString());
                         if (cost.HasValue)
-                            persons[id].Costs.Add((date.Month, cost.Value));
+                            persons[id2].Costs.Add((date.Month, cost.Value));
                         else
-                            Console.Out.WriteLine($"Ошибка. Не удалось прочитать сумму поступления по ID '{id}'. Строка {row2}.");
+                            Console.Out.WriteLine($"Ошибка. Не удалось прочитать сумму поступления по ID '{id2}'. Строка {row2}.");
                     }
                     else
-                        Console.Out.WriteLine($"Ошибка. В основном файле нет записи с ID '{id}'. Строка {row2}.");
+                        Console.Out.WriteLine($"Ошибка. В основном файле нет записи с ID '{id2}'. Строка {row2}.");
 
                     row2++;
-                    id = (sheet2.Cells[row2, 3] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString();
+                    id2 = (sheet2.Cells[row2, 3] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString();
                 }
                 Console.Out.WriteLine($"Прочитано записей файла поступлений: {row2 - 1}\n");
 
                 foreach (var person in persons.Values)
                 {
-                    row1 = person.Row;
                     foreach (var (month, sum) in person.Costs)
-                        (sheet1.Cells[row1, 24 + month] as Microsoft.Office.Interop.Excel.Range).Value = sum;
+                        (wb1.Sheets.Item[person.SheetNumber].Cells[person.Row, 24 + month] as Microsoft.Office.Interop.Excel.Range).Value = sum;
                 }
 
                 wb1.Close(true);
