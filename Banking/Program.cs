@@ -95,14 +95,15 @@ namespace Banking
                 foreach (var person in persons.Values)
                     (wb1.Sheets.Item[person.SheetNumber].Cells[person.Row, 6] as Microsoft.Office.Interop.Excel.Range).Value2 = person.Balance;
 
+                Console.Out.WriteLine($"Сохранение...");
                 wb1.Save(); wb1.Close();
                 wb2.Save(); wb2.Close();
-                Console.Out.WriteLine($"Данные о поступлениях сохранены");
+                Console.Out.WriteLine($"Данные о поступлениях сохранены.");
             }
             catch (Exception e)
             {
                 Console.Error.WriteLine(e.Message);
-                Console.Out.WriteLine("Работа программы завершена");
+                Console.Out.WriteLine("Работа программы завершена.");
             }
             finally
             {
