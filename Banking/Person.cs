@@ -6,6 +6,7 @@ namespace Banking
     {
         public string Id { private set; get; }
         public double InitBalance { private set; get; }
+        public double Balance { set; get; }
         public int SheetNumber { private set; get; }
         public int Row { private set; get; }
         public List<(int month, double sum)> Costs { private set; get; } = new List<(int, double)>();
@@ -13,7 +14,7 @@ namespace Banking
         public Person(string id, double initBalance, int sheetNumber, int row)
         {
             Id = id;
-            InitBalance = initBalance;
+            InitBalance = Balance = initBalance;
             SheetNumber = sheetNumber;
             Row = row;
         }

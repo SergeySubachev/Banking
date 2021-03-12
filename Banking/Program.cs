@@ -47,7 +47,7 @@ namespace Banking
                             Console.Out.WriteLine($"Ошибка. Повторение ID в основном файле: '{id}'. Строка {row1} пропускается.");
                         else
                         {
-                            string balance = (sheet1.Cells[row1, 6] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString();
+                            string balance = (sheet1.Cells[row1, 5] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString();
                             double? initbalance = convertToDouble(balance);
                             if (initbalance.HasValue)
                                 persons.Add(id, new Person(id, initbalance.Value, i, row1));
@@ -61,7 +61,7 @@ namespace Banking
                     Console.Out.WriteLine($"Прочитано записей вкладки {i}: {row1 - FILE_1_DATA_BEGINING}\n");
                 }
 
-                var wb2 = excelApp.Workbooks.Open(filename2);
+                var wb2 = excelApp.Workbooks.Open(filename2, false, false);
                 var sheet2 = (Microsoft.Office.Interop.Excel.Worksheet)wb2.Sheets.Item[1];
                 int row2 = FILE_2_DATA_BEGINING;
                 Console.WriteLine($"Чтение файла поступлений...");
@@ -73,7 +73,13 @@ namespace Banking
                         DateTime date = DateTime.FromOADate((double)(sheet2.Cells[row2, 4] as Microsoft.Office.Interop.Excel.Range).Value2);
                         double? cost = convertToDouble((sheet2.Cells[row2, 5] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString());
                         if (cost.HasValue)
-                            persons[id2].Costs.Add((date.Month, cost.Value));
+                        {
+                            var person = persons[id2];
+                            person.Costs.Add((date.Month, cost.Value));
+                            person.Balance -= cost.Value;
+                            (sheet2.Cells[row2, 6] as Microsoft.Office.Interop.Excel.Range).Value2 = person.Balance;
+                            (wb1.Sheets.Item[person.SheetNumber].Cells[person.Row, 24 + date.Month] as Microsoft.Office.Interop.Excel.Range).Value2 = cost.Value;
+                        }
                         else
                             Console.Out.WriteLine($"Ошибка. Не удалось прочитать сумму поступления по ID '{id2}'. Строка {row2}.");
                     }
@@ -83,19 +89,14 @@ namespace Banking
                     row2++;
                     id2 = (sheet2.Cells[row2, 3] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString();
                 }
-                Console.Out.WriteLine($"Прочитано записей файла поступлений: {row2 - FILE_2_DATA_BEGINING} на сумму {persons.Values.SelectMany(p => p.Costs).Select(c => c.sum).Sum():0.## р.}\n");
+                var allCosts = persons.Values.SelectMany(p => p.Costs);
+                Console.Out.WriteLine($"Всего прочитано поступлений: {allCosts.Count()} на сумму {allCosts.Select(c => c.sum).Sum():0.## р.}\n");
 
                 foreach (var person in persons.Values)
-                {
-                    foreach (var (month, sum) in person.Costs)
-                        (wb1.Sheets.Item[person.SheetNumber].Cells[person.Row, 24 + month] as Microsoft.Office.Interop.Excel.Range).Value2 = sum;
-                    if (person.Costs.Any())
-                        (wb1.Sheets.Item[person.SheetNumber].Cells[person.Row, 6] as Microsoft.Office.Interop.Excel.Range).Value2 = person.InitBalance - person.Costs.Sum(p => p.sum);
-                }
+                    (wb1.Sheets.Item[person.SheetNumber].Cells[person.Row, 6] as Microsoft.Office.Interop.Excel.Range).Value2 = person.Balance;
 
-                wb1.Save();
-                wb1.Close();
-                wb2.Close();
+                wb1.Save(); wb1.Close();
+                wb2.Save(); wb2.Close();
                 Console.Out.WriteLine($"Данные о поступлениях сохранены");
             }
             catch (Exception e)
