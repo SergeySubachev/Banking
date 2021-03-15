@@ -87,7 +87,6 @@ namespace Banking
                             person.Costs.Add((date.Month, cost.Value));
                             person.Balance -= cost.Value;
                             (sheet2.Cells[row2, 6] as Microsoft.Office.Interop.Excel.Range).Value2 = person.Balance;
-                            (wb1.Sheets.Item[person.SheetNumber].Cells[person.Row, 24 + date.Month] as Microsoft.Office.Interop.Excel.Range).Value2 = cost.Value;
                         }
                         else
                             Console.Out.WriteLine($"Ошибка. Не удалось прочитать сумму поступления по ID '{id2}'. Строка {row2}.");
@@ -99,11 +98,18 @@ namespace Banking
                     id2 = (sheet2.Cells[row2, 3] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString();
                 }
                 var allCosts = persons.Values.SelectMany(p => p.Costs);
-                Console.Out.WriteLine($"Всего прочитано поступлений: {allCosts.Count()} на сумму {allCosts.Select(c => c.sum).Sum():0.## р.}\n");
+                Console.Out.WriteLine($"Всего прочитано поступлений: {allCosts.Count()} на сумму {allCosts.Select(c => c.value).Sum():0.## р.}\n");
 
-                Console.Out.WriteLine($"Обновление остатков долга...");
+                Console.Out.WriteLine($"Обработка поступлений, обновление остатков...");
                 foreach (var person in persons.Values)
+                {
+                    foreach (var costsInMounth in person.Costs.GroupBy(item => item.month))
+                    {
+                        double sumInMounth = costsInMounth.Sum(cost => cost.value);
+                        (wb1.Sheets.Item[person.SheetNumber].Cells[person.Row, 24 + costsInMounth.Key] as Microsoft.Office.Interop.Excel.Range).Value2 = sumInMounth;
+                    }
                     (wb1.Sheets.Item[person.SheetNumber].Cells[person.Row, 6] as Microsoft.Office.Interop.Excel.Range).Value2 = person.Balance;
+                }    
 
                 Console.Out.WriteLine($"Сохранение...");
                 wb1.Save(); wb1.Close();
@@ -122,6 +128,7 @@ namespace Banking
 
             Console.Out.WriteLine("Нажмите любую клавишу");
             Console.ReadKey();
+            Console.Out.WriteLine("Дождитесь закрытия программы...");
         }
 
         private static double? convertToDouble(string balance)

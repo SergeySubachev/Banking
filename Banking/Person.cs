@@ -9,7 +9,7 @@ namespace Banking
         public double Balance { set; get; }
         public int SheetNumber { private set; get; }
         public int Row { private set; get; }
-        public List<(int month, double sum)> Costs { private set; get; } = new List<(int, double)>();
+        public List<(int month, double value)> Costs { private set; get; } = new List<(int, double)>();
 
         public Person(string id, double initBalance, int sheetNumber, int row)
         {
