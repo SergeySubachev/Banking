@@ -47,8 +47,17 @@ namespace Banking
                             Console.Out.WriteLine($"Ошибка. Повторение ID в основном файле: '{id}'. Строка {row1} пропускается.");
                         else
                         {
-                            string balance = (sheet1.Cells[row1, 5] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString();
-                            double? initbalance = convertToDouble(balance);
+                            string balanceStr = (sheet1.Cells[row1, 6] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString();
+                            double? initbalance;
+                            if (string.IsNullOrWhiteSpace(balanceStr))
+                            {
+                                Console.Out.WriteLine($"Пустая ячейка 'Остаток долга'. Строка {row1}. Принято 0.");
+                                initbalance = 0;
+                            }
+                            else
+                            {
+                                initbalance = convertToDouble(balanceStr);
+                            }
                             if (initbalance.HasValue)
                                 persons.Add(id, new Person(id, initbalance.Value, i, row1));
                             else
@@ -92,6 +101,7 @@ namespace Banking
                 var allCosts = persons.Values.SelectMany(p => p.Costs);
                 Console.Out.WriteLine($"Всего прочитано поступлений: {allCosts.Count()} на сумму {allCosts.Select(c => c.sum).Sum():0.## р.}\n");
 
+                Console.Out.WriteLine($"Обновление остатков долга...");
                 foreach (var person in persons.Values)
                     (wb1.Sheets.Item[person.SheetNumber].Cells[person.Row, 6] as Microsoft.Office.Interop.Excel.Range).Value2 = person.Balance;
 
