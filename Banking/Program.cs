@@ -128,7 +128,7 @@ namespace Banking
 
             Console.Out.WriteLine("Нажмите любую клавишу");
             Console.ReadKey();
-            Console.Out.WriteLine("Дождитесь закрытия программы...");
+            Console.Out.WriteLine(" Дождитесь закрытия программы...");
         }
 
         private static double? convertToDouble(string balance)
