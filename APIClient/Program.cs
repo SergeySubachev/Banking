@@ -7,19 +7,14 @@ using System.Windows.Forms;
 
 namespace APIClient
 {
-    class Program
+    public class Program
     {
         internal static int FILE_DATA_BEGINING = 2;
 
         [STAThread]
         static void Main(string[] args)
         {
-            string exePath = Assembly.GetEntryAssembly().Location;
-#if DEBUG
-            string keyFileName = Path.Combine(Directory.GetParent(exePath).FullName, @"..\..\api-key.txt");
-#else
-            string keyFileName = Path.Combine(Directory.GetParent(exePath).FullName, "api-key.txt");
-#endif
+            string keyFileName = GetApiKeyFileName();
             if (!File.Exists(keyFileName))
                 Console.Out.WriteLine($"Ошибка. Не найден ключ доступа к серверу '{keyFileName}'.");
 
@@ -98,7 +93,18 @@ namespace APIClient
             Console.Out.WriteLine(" Дождитесь закрытия программы...");
         }
 
-        private static string GetApiKey(string keyFileName)
+        public static string GetApiKeyFileName()
+        {
+            string exePath = Assembly.GetEntryAssembly().Location;
+#if DEBUG
+            string keyFileName = Path.Combine(Directory.GetParent(exePath).FullName, @"..\..\api-key.txt");
+#else
+            string keyFileName = Path.Combine(Directory.GetParent(exePath).FullName, "api-key.txt");
+#endif
+            return keyFileName;
+        }
+
+        public static string GetApiKey(string keyFileName)
         {
             string res = File.ReadAllText(keyFileName);
             return res.Trim();

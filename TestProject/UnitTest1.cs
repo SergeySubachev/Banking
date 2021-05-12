@@ -1,4 +1,3 @@
-using APIClient;
 using ApprovalTests;
 using ApprovalTests.Reporters;
 using FluentAssertions;
@@ -10,6 +9,8 @@ namespace TestProject
 {
     public class Tests
     {
+        private string apiKey = "";
+
         [SetUp]
         public void Setup()
         {
@@ -53,7 +54,7 @@ namespace TestProject
             //https://documenter.getpostman.com/view/407152/T1Dv7ZXg#8c193790-3ace-41b6-a409-6e18ae37eba1
             var client = new RestClient("https://api.explorer.debex.ru/production/usage") { Timeout = -1 };
             var request = new RestRequest(Method.GET);
-            request.AddHeader("x-api-key", "productionKJdsnvkjnlekfnsdokfnj32n23523");
+            request.AddHeader("x-api-key", apiKey);
             request.AddParameter("text/plain", "", ParameterType.RequestBody);
             IRestResponse response = client.Execute(request);
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
@@ -76,11 +77,11 @@ namespace TestProject
         {
             var client = new RestClient("https://api.explorer.debex.ru/production/jurisdiction") { Timeout = -1 };
             var request = new RestRequest(Method.POST);
-            request.AddHeader("x-api-key", "productionKJdsnvkjnlekfnsdokfnj32n23523");
+            request.AddHeader("x-api-key", apiKey);
             request.AddParameter("address", "Екатеринбург, Комсомольская, 67");
             IRestResponse response = client.Execute(request);
 
-            var result = JsonSerializer.Deserialize<ResponseDto>(response.Content);
+            var result = JsonSerializer.Deserialize<APIClient.ResponseDto>(response.Content);
             result.Should().NotBeNull();
         }
     }
