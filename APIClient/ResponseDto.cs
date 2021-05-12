@@ -79,6 +79,7 @@ namespace APIClient
         [JsonPropertyName("ufk.address")]
         public string UfkAddress { get; set; }
 
+        #region With get_fssp_geo=1
         [JsonPropertyName("fssp.name")]
         public string FsspName { get; set; }
 
@@ -86,6 +87,7 @@ namespace APIClient
         public string FsspAddress { get; set; }
 
         [JsonPropertyName("fssp.phone")]
-        public string FsspPhone { get; set; }
+        public string FsspPhone { get; set; } 
+        #endregion
     }
 }
