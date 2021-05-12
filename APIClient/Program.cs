@@ -67,19 +67,12 @@ namespace APIClient
                                 if (val != null)
                                     (sheet.Cells[row, 3 + i] as Microsoft.Office.Interop.Excel.Range).Value2 = val.ToString();
                             }
-                            Console.Out.WriteLine($"OK");
-                        }
-                        else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
-                        {
-
-                        }
-                        else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                        {
-
+                            Console.Out.WriteLine("OK");
                         }
                         else
                         {
-
+                            string msg = $"Ошибка {(int)response.StatusCode} - {response.StatusCode}";
+                            (sheet.Cells[row, 3] as Microsoft.Office.Interop.Excel.Range).Value2 = msg;
                         }
                     }
 
@@ -90,14 +83,19 @@ namespace APIClient
                 wb.Save(); wb.Close();
                 Console.Out.WriteLine($"Данные сохранены.");
             }
-            catch (Exception)
+            catch (Exception e)
             {
-
-                throw;
+                Console.Error.WriteLine(e.Message);
+                Console.Out.WriteLine("Работа программы завершена.");
+            }
+            finally
+            {
+                excelApp.Quit();
             }
 
             Console.Out.WriteLine("Нажмите любую клавишу");
             Console.ReadKey();
+            Console.Out.WriteLine(" Дождитесь закрытия программы...");
         }
 
         private static string GetApiKey(string keyFileName)
