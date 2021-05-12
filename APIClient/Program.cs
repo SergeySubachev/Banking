@@ -42,10 +42,12 @@ namespace APIClient
                 string id = (sheet.Cells[row, 1] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString();
                 while (!string.IsNullOrWhiteSpace(id))
                 {
+                    Console.Out.Write($"ID {id}: ");
+
                     string address = (sheet.Cells[row, 2] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString();
                     if (string.IsNullOrWhiteSpace(address))
                     {
-                        Console.Out.WriteLine($"Пустая ячейка адреса. Строка {row}. ID {id}.");
+                        Console.Out.WriteLine($"Пустая ячейка адреса. Строка {row}.");
                     }
                     else
                     {
@@ -60,7 +62,10 @@ namespace APIClient
                             {
                                 var val = dtoProps[i].GetValue(resultObj.Result.Court);
                                 if (val != null)
+                                {
+                                    (sheet.Cells[row, 3 + i] as Microsoft.Office.Interop.Excel.Range).NumberFormat = "@";
                                     (sheet.Cells[row, 3 + i] as Microsoft.Office.Interop.Excel.Range).Value2 = val.ToString();
+                                }
                             }
                             Console.Out.WriteLine("OK");
                         }
@@ -68,6 +73,7 @@ namespace APIClient
                         {
                             string msg = $"Ошибка {(int)response.StatusCode} - {response.StatusCode}";
                             (sheet.Cells[row, 3] as Microsoft.Office.Interop.Excel.Range).Value2 = msg;
+                            Console.Out.WriteLine(msg);
                         }
                     }
 

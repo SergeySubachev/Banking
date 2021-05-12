@@ -80,14 +80,14 @@ namespace APIClient
         public string UfkAddress { get; set; }
 
         #region With get_fssp_geo=1
-        [JsonPropertyName("fssp.name")]
-        public string FsspName { get; set; }
+        //[JsonPropertyName("fssp.name")]
+        //public string FsspName { get; set; }
 
-        [JsonPropertyName("fssp.address")]
-        public string FsspAddress { get; set; }
+        //[JsonPropertyName("fssp.address")]
+        //public string FsspAddress { get; set; }
 
-        [JsonPropertyName("fssp.phone")]
-        public string FsspPhone { get; set; } 
+        //[JsonPropertyName("fssp.phone")]
+        //public string FsspPhone { get; set; } 
         #endregion
     }
 }
