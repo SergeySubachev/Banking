@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestProject", "TestProject\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APICheckStatus", "APICheckStatus\APICheckStatus.csproj", "{0E8C730A-C7B8-4B2E-9713-1E4D20ED0404}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientBankExchange", "ClientBankExchange\ClientBankExchange.csproj", "{83B03A52-27B0-4170-89F3-A26EC41BC3F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{0E8C730A-C7B8-4B2E-9713-1E4D20ED0404}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E8C730A-C7B8-4B2E-9713-1E4D20ED0404}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E8C730A-C7B8-4B2E-9713-1E4D20ED0404}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83B03A52-27B0-4170-89F3-A26EC41BC3F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83B03A52-27B0-4170-89F3-A26EC41BC3F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83B03A52-27B0-4170-89F3-A26EC41BC3F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83B03A52-27B0-4170-89F3-A26EC41BC3F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
