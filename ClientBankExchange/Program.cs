@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Text;
 using System.Windows.Forms;
 
 namespace ClientBankExchange
@@ -7,6 +9,7 @@ namespace ClientBankExchange
     {
         internal static int FILE_DATA_BEGINING = 1;
 
+        [STAThread]
         static void Main(string[] args)
         {
             string xmlFilename;
@@ -24,40 +27,41 @@ namespace ClientBankExchange
                 var sheet = (Microsoft.Office.Interop.Excel.Worksheet)wb.Sheets.Item[1];
                 int row = FILE_DATA_BEGINING;
                 var document = new ExchangeDocument();
-                while (tryConvertToString(sheet, row, 1, out string id))
+                while (TryConvertToString(sheet, row, 1, out string id))
                 {
                     var docSection = new ExchangeDocumentSection { Id = id };
-                    if (!tryConvertToString(sheet, row, 2, out docSection.Name) ||
-                        !tryConvertToDate(sheet, row, 2, out docSection.Birthday) ||
-                        !tryConvertToString(sheet, row, 2, out docSection.Court) ||
-                        !tryConvertToString(sheet, row, 2, out docSection.CourtAddress) ||
-                        !tryConvertToString(sheet, row, 2, out docSection.Recipient) ||
-                        !tryConvertToString(sheet, row, 2, out docSection.KPP) ||
-                        !tryConvertToString(sheet, row, 2, out docSection.INN) ||
-                        !tryConvertToString(sheet, row, 2, out docSection.OKTMO) ||
-                        !tryConvertToString(sheet, row, 2, out docSection.RecipientAccount) ||
-                        !tryConvertToString(sheet, row, 2, out docSection.TreasuryAccount) ||
-                        !tryConvertToString(sheet, row, 2, out docSection.Bank) ||
-                        !tryConvertToString(sheet, row, 2, out docSection.City) ||
-                        !tryConvertToString(sheet, row, 2, out docSection.PaymentType) ||
-                        !tryConvertToString(sheet, row, 2, out docSection.SenderStatus) ||
-                        !tryConvertToString(sheet, row, 2, out docSection.PaymentPurpose) ||
-                        !tryConvertToString(sheet, row, 2, out docSection.BIK) ||
-                        !tryConvertToString(sheet, row, 2, out docSection.KBK) ||
-                        !tryConvertToString(sheet, row, 2, out docSection.AgreementNumber) ||
-                        !tryConvertToCurrency(sheet, row, 2, out docSection.ClaimAmount) ||
-                        !tryConvertToCurrency(sheet, row, 2, out docSection.StateDutyAmount))
-                        Console.Out.WriteLine($"Ошибка. Повторение ID в основном файле: '{id}'. Строка {row1} пропускается.");
+                    if (!TryConvertToString(sheet, row, 2, out docSection.Name) ||
+                        !TryConvertToDate(sheet, row, 3, out docSection.Birthday) ||
+                        !TryConvertToString(sheet, row, 4, out docSection.Court) ||
+                        !TryConvertToString(sheet, row, 5, out docSection.CourtAddress) ||
+                        !TryConvertToString(sheet, row, 6, out docSection.Recipient) ||
+                        !TryConvertToString(sheet, row, 7, out docSection.RecipientKPP) ||
+                        !TryConvertToString(sheet, row, 8, out docSection.RecipientINN) ||
+                        !TryConvertToString(sheet, row, 9, out docSection.RecipientOKTMO) ||
+                        !TryConvertToString(sheet, row, 10, out docSection.RecipientAccount) ||
+                        !TryConvertToString(sheet, row, 11, out docSection.TreasuryAccount) ||
+                        !TryConvertToString(sheet, row, 12, out docSection.Bank) ||
+                        !TryConvertToString(sheet, row, 13, out docSection.City) ||
+                        !TryConvertToString(sheet, row, 14, out docSection.PaymentType) ||
+                        !TryConvertToString(sheet, row, 15, out docSection.SenderStatus) ||
+                        !TryConvertToString(sheet, row, 16, out docSection.PaymentPurpose) ||
+                        !TryConvertToString(sheet, row, 17, out docSection.BIK) ||
+                        !TryConvertToString(sheet, row, 18, out docSection.KBK) ||
+                        !TryConvertToString(sheet, row, 19, out docSection.AgreementNumber) ||
+                        !TryConvertToDouble(sheet, row, 20, out docSection.ClaimAmount) ||
+                        !TryConvertToDouble(sheet, row, 21, out docSection.StateDutyAmount))
+                        Console.Out.WriteLine($"Ошибка чтения данных. Строка {row} пропускается.");
                     else
                         document.Sections.Add(docSection);
                     row++;
                 }
-                Console.Out.WriteLine($"Прочитано записей таблицы: {row - FILE_DATA_BEGINING}\n");
+                wb.Close();
+                Console.Out.WriteLine("");
 
-                Console.Out.WriteLine($"Сохранение...");
-                wb1.Save(); wb1.Close();
-                wb2.Save(); wb2.Close();
-                Console.Out.WriteLine($"Данные о поступлениях сохранены.");
+                Console.Out.WriteLine($"Экспорт...");
+                string txtFilename = Path.ChangeExtension(xmlFilename, "txt");
+                File.WriteAllText(txtFilename, document.ToString(), Encoding.GetEncoding(1251));
+                Console.Out.WriteLine($"Экпорт выполнен. Имя файла: \"{Path.GetFileName(txtFilename)}\".");
             }
             catch (Exception e)
             {
@@ -71,33 +75,46 @@ namespace ClientBankExchange
 
             Console.Out.WriteLine("Нажмите любую клавишу");
             Console.ReadKey();
-            Console.Out.WriteLine(" Дождитесь закрытия программы...");
+            Console.Out.WriteLine("Дождитесь закрытия программы...");
         }
 
-        private static bool tryConvertToString(Microsoft.Office.Interop.Excel.Worksheet sheet, int row, int col, out string value)
+        private static bool TryConvertToString(Microsoft.Office.Interop.Excel.Worksheet sheet, int row, int col, out string value)
         {
             value = (sheet.Cells[row, col] as Microsoft.Office.Interop.Excel.Range)?.Value2?.ToString();
-            return !string.IsNullOrWhiteSpace(value);
+            if (!string.IsNullOrEmpty(value))
+                value = value.Trim(new[] { ' ', '.' });
+            return !string.IsNullOrEmpty(value);
         }
 
-        private static bool tryConvertToDouble(string str, out double value)
+        private static bool TryConvertToDouble(Microsoft.Office.Interop.Excel.Worksheet sheet, int row, int col, out double value)
         {
-            value = double.NaN;
-            if (string.IsNullOrEmpty(str)) return false;
+            value = default;
+            if (!TryConvertToString(sheet, row, col, out string stringValue))
+                return false;
 
-            bool hasComma = str.Contains(",");
-            bool hasPoint = str.Contains(".");
+            bool hasComma = stringValue.Contains(",");
+            bool hasPoint = stringValue.Contains(".");
             if (hasPoint)
             {
                 if (hasComma)
-                    str = str.Remove(str.IndexOf('.'), 1);
+                    stringValue = stringValue.Remove(stringValue.IndexOf('.'), 1);
                 else
-                    str = str.Replace('.', ',');
+                    stringValue = stringValue.Replace('.', ',');
             }
 
-            if (double.TryParse(str, out value))
+            if (double.TryParse(stringValue, out value))
                 return true;
             return false;
+        }
+
+        private static bool TryConvertToDate(Microsoft.Office.Interop.Excel.Worksheet sheet, int row, int col, out DateTime value)
+        {
+            value = default;
+            if (!TryConvertToString(sheet, row, col, out string stringValue))
+                return false;
+            if (!DateTime.TryParse(stringValue, out value))
+                return false;
+            return true;
         }
     }
 }

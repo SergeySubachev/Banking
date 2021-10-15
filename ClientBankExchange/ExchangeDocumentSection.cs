@@ -1,4 +1,6 @@
-﻿namespace ClientBankExchange
+﻿using System;
+
+namespace ClientBankExchange
 {
     /// <summary>
     /// СекцияДокумент=Платежное поручение
@@ -8,13 +10,12 @@
         public string
             Id,
             Name,
-            Birthday,
             Court, //суд
             CourtAddress, //адрес суда
             Recipient, //Наименование получателя платежа
-            KPP, //КПП
-            INN, //ИНН
-            OKTMO, //ОКТМО
+            RecipientKPP, //КПП
+            RecipientINN, //ИНН
+            RecipientOKTMO, //ОКТМО
             RecipientAccount, //Номер счета получателя платежа
             TreasuryAccount, //номер казначейского счета
             Bank, //Наименование банка
@@ -24,7 +25,12 @@
             PaymentPurpose, //Назначение платежа
             BIK, //БИК
             KBK, //Код бюджетной классификации(КБК)
-            AgreementNumber, //Номер кредитного договора
+            AgreementNumber; //Номер кредитного договора
+
+        public DateTime 
+            Birthday;
+
+        public double
             ClaimAmount, //Сумма иска
             StateDutyAmount; //Сумма ГП
     }
