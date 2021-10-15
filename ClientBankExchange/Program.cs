@@ -12,17 +12,18 @@ namespace ClientBankExchange
         [STAThread]
         static void Main(string[] args)
         {
-            string xmlFilename;
+            string xlsFilename;
             var ofd = new OpenFileDialog { Title = "Открыть файл Excel" };
             if (ofd.ShowDialog() != DialogResult.OK)
                 return;
-            xmlFilename = ofd.FileName;
+            xlsFilename = ofd.FileName;
 
             Microsoft.Office.Interop.Excel.Application excelApp = null;
             try
             {
                 excelApp = new Microsoft.Office.Interop.Excel.Application();
-                var wb = excelApp.Workbooks.Open(xmlFilename, false, false);
+                var wb = excelApp.Workbooks.Open(xlsFilename, false, false);
+                Console.Out.WriteLine(Path.GetFileName(xlsFilename));
                 Console.WriteLine($"Чтение данных...");
                 var sheet = (Microsoft.Office.Interop.Excel.Worksheet)wb.Sheets.Item[1];
                 int row = FILE_DATA_BEGINING;
@@ -59,7 +60,7 @@ namespace ClientBankExchange
                 Console.Out.WriteLine("");
 
                 Console.Out.WriteLine($"Экспорт...");
-                string txtFilename = Path.ChangeExtension(xmlFilename, "txt");
+                string txtFilename = Path.ChangeExtension(xlsFilename, "txt");
                 File.WriteAllText(txtFilename, document.ToString(), Encoding.GetEncoding(1251));
                 Console.Out.WriteLine($"Экпорт выполнен. Имя файла: \"{Path.GetFileName(txtFilename)}\".");
             }
