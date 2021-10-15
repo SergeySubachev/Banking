@@ -62,7 +62,7 @@ namespace ClientBankExchange
                 Console.Out.WriteLine($"Экспорт...");
                 string txtFilename = Path.ChangeExtension(xlsFilename, "txt");
                 File.WriteAllText(txtFilename, document.ToString(), Encoding.GetEncoding(1251));
-                Console.Out.WriteLine($"Экпорт выполнен. Имя файла: \"{Path.GetFileName(txtFilename)}\".");
+                Console.Out.WriteLine($"Экпорт выполнен. Количество записей: {document.Sections.Count}. Имя файла: \"{Path.GetFileName(txtFilename)}\".");
             }
             catch (Exception e)
             {
