@@ -7,7 +7,7 @@ namespace ClientBankExchange
 {
     class Program
     {
-        internal static int FILE_DATA_BEGINING = 1;
+        internal static int FILE_DATA_BEGINING = 2;
 
         [STAThread]
         static void Main(string[] args)
@@ -90,7 +90,10 @@ namespace ClientBankExchange
         {
             value = default;
             if (!TryConvertToString(sheet, row, col, out string stringValue))
+            {
+                Console.Out.Write($"Пустая ячейка (строка {row}, столбец {col}. ");
                 return false;
+            }
 
             bool hasComma = stringValue.Contains(",");
             bool hasPoint = stringValue.Contains(".");
@@ -102,18 +105,32 @@ namespace ClientBankExchange
                     stringValue = stringValue.Replace('.', ',');
             }
 
-            if (double.TryParse(stringValue, out value))
-                return true;
-            return false;
+            if (!double.TryParse(stringValue, out value))
+            {
+                Console.Out.Write($"Не удалось прочитать число \"{stringValue}\". Cтрока {row}, столбец {col}. ");
+                return false;
+            }
+            return true;
         }
 
         private static bool TryConvertToDate(Microsoft.Office.Interop.Excel.Worksheet sheet, int row, int col, out DateTime value)
         {
             value = default;
             if (!TryConvertToString(sheet, row, col, out string stringValue))
+            {
+                Console.Out.Write($"Не удалось прочитать дату \"{stringValue}\". Cтрока {row}, столбец {col}. ");
                 return false;
-            if (!DateTime.TryParse(stringValue, out value))
+            }
+
+            try
+            {
+                value = DateTime.FromOADate((double)(sheet.Cells[row, col] as Microsoft.Office.Interop.Excel.Range).Value2);
+            }
+            catch (ArgumentException)
+            {
+                Console.Out.Write($"Не удалось прочитать дату \"{stringValue}\". Cтрока {row}, столбец {col}. ");
                 return false;
+            }
             return true;
         }
     }

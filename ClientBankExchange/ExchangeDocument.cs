@@ -51,7 +51,7 @@ namespace ClientBankExchange
                 strBuilder.AppendLine($"СтатусСоставителя={section.SenderStatus}");
                 strBuilder.AppendLine("ПлательщикКПП=667901001");
                 strBuilder.AppendLine($"ПолучательКПП={section.RecipientKPP}");
-                strBuilder.AppendLine($"ПоказательКБК ={section.KBK}");
+                strBuilder.AppendLine($"ПоказательКБК={section.KBK}");
                 strBuilder.AppendLine($"ОКАТО={section.RecipientOKTMO}");
                 strBuilder.AppendLine("ПоказательОснования=ТП");
                 strBuilder.AppendLine("ПоказательПериода=0");
