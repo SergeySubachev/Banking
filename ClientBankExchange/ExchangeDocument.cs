@@ -17,17 +17,17 @@ namespace ClientBankExchange
             strBuilder.AppendLine("Кодировка=Windows");
             strBuilder.AppendLine("Отправитель=Бухгалтерия предприятия, редакция 3.0");
             strBuilder.AppendLine("Получатель=");
-            strBuilder.AppendLine($"ДатаСоздания={DateTime.Today}");
-            strBuilder.AppendLine($"ВремяСоздания={DateTime.Now}");
-            strBuilder.AppendLine($"ДатаНачала={DateTime.Today}");
-            strBuilder.AppendLine($"ДатаКонца={DateTime.Today}");
+            strBuilder.AppendLine($"ДатаСоздания={DateTime.Today.Date}");
+            strBuilder.AppendLine($"ВремяСоздания={DateTime.Now.TimeOfDay}");
+            strBuilder.AppendLine($"ДатаНачала={DateTime.Today.Date}");
+            strBuilder.AppendLine($"ДатаКонца={DateTime.Today.Date}");
             strBuilder.AppendLine("РасчСчет=40702810562100001617");
             strBuilder.AppendLine("Документ=Платежное поручение");
             foreach (var section in Sections)
             {
                 strBuilder.AppendLine("СекцияДокумент=Платежное поручение");
                 strBuilder.AppendLine($"Номер={section.Id}");
-                strBuilder.AppendLine($"Дата={DateTime.Today}");
+                strBuilder.AppendLine($"Дата={DateTime.Today.Date}");
                 strBuilder.AppendLine($"Сумма={section.StateDutyAmount.ToString("0.00", CultureInfo.CreateSpecificCulture("en-US"))}");
                 strBuilder.AppendLine("ПлательщикСчет=40702810562100001617");
                 strBuilder.AppendLine("Плательщик=ИНН 6671021289 ООО КОЛЛЕКТОРСКОЕ АГЕНТСТВО \"ОРПЗ\"");

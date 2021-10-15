@@ -75,6 +75,7 @@ namespace ClientBankExchange
 
             Console.Out.WriteLine("Нажмите любую клавишу");
             Console.ReadKey();
+            Console.Out.WriteLine("");
             Console.Out.WriteLine("Дождитесь закрытия программы...");
         }
 
