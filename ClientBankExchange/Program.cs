@@ -123,17 +123,17 @@ namespace ClientBankExchange
                 Console.Out.Write($"Не удалось прочитать дату \"{stringValue}\". Cтрока {row}, столбец {col}. ");
                 return false;
             }
+            return DateTime.TryParse(stringValue, out value);
 
-            try
-            {
-                value = DateTime.FromOADate((double)(sheet.Cells[row, col] as Microsoft.Office.Interop.Excel.Range).Value2);
-            }
-            catch (ArgumentException)
-            {
-                Console.Out.Write($"Не удалось прочитать дату \"{stringValue}\". Cтрока {row}, столбец {col}. ");
-                return false;
-            }
-            return true;
+            //try
+            //{
+            //    value = DateTime.FromOADate((double)(sheet.Cells[row, col] as Microsoft.Office.Interop.Excel.Range).Value2);
+            //}
+            //catch (ArgumentException)
+            //{
+            //    Console.Out.Write($"Не удалось прочитать дату \"{stringValue}\". Cтрока {row}, столбец {col}. ");
+            //    return false;
+            //}
         }
     }
 }
