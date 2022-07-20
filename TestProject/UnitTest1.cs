@@ -26,7 +26,7 @@ namespace TestProject
             var client = new RestClient("https://api.github.com/zen");
             var request = new RestRequest(Method.GET);
 
-            IRestResponse response = client.Execute(request);
+            var response = client.Execute(request);
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         }
 
@@ -37,7 +37,7 @@ namespace TestProject
             var client = new RestClient("https://api.github.com/users/SergeySubachev");
             var request = new RestRequest(Method.GET);
 
-            IRestResponse response = client.Execute(request);
+            var response = client.Execute(request);
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
 
             Approvals.VerifyJson(response.Content);
@@ -56,7 +56,7 @@ namespace TestProject
             var request = new RestRequest(Method.GET);
             request.AddHeader("x-api-key", apiKey);
             request.AddParameter("text/plain", "", ParameterType.RequestBody);
-            IRestResponse response = client.Execute(request);
+            var response = client.Execute(request);
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         }
 
@@ -68,7 +68,7 @@ namespace TestProject
             var request = new RestRequest(Method.POST);
             request.AddHeader("x-api-key", "productionKJdsnvkjnlekfnsdokfnj32n23523");
             request.AddParameter("address", "Екатеринбург, Комсомольская, 67");
-            IRestResponse response = client.Execute(request);
+            var response = client.Execute(request);
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         }
 
@@ -79,7 +79,7 @@ namespace TestProject
             var request = new RestRequest(Method.POST);
             request.AddHeader("x-api-key", apiKey);
             request.AddParameter("address", "Екатеринбург, Комсомольская, 67");
-            IRestResponse response = client.Execute(request);
+            var response = client.Execute(request);
 
             var result = JsonSerializer.Deserialize<APIClient.ResponseDto>(response.Content);
             result.Should().NotBeNull();

@@ -17,7 +17,7 @@ namespace APICheckStatus
             var request = new RestRequest(Method.GET);
             request.AddHeader("x-api-key", key);
             request.AddParameter("text/plain", "", ParameterType.RequestBody);
-            IRestResponse response = client.Execute(request);
+            var response = client.Execute(request);
             Console.Out.WriteLine(response.Content);
             Console.Out.WriteLine("\nНажмите любую клавишу");
             Console.ReadKey();

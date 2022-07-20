@@ -1,4 +1,5 @@
 ﻿using RestSharp;
+using RestSharp.Serializers;
 using System;
 using System.IO;
 using System.Reflection;
@@ -28,8 +29,9 @@ namespace APIClient
             Microsoft.Office.Interop.Excel.Application excelApp = null;
             try
             {
-                var client = new RestClient("https://api.explorer.debex.ru/production/jurisdiction") { Timeout = -1 };
-
+                //в новой версии Url надо писать и в запросе.
+                string resourceUrl = "https://api.explorer.debex.ru/production/jurisdiction";
+                var client = new RestClient(resourceUrl);
                 excelApp = new Microsoft.Office.Interop.Excel.Application();
                 var wb = excelApp.Workbooks.Open(excelFileName, false, false);
                 var sheet = (Microsoft.Office.Interop.Excel.Worksheet)wb.Sheets[1];
@@ -51,10 +53,15 @@ namespace APIClient
                     }
                     else
                     {
-                        var request = new RestRequest(Method.POST);
+                        var request = new RestRequest(resourceUrl, Method.Post)
+                        {
+                            RequestFormat = DataFormat.Json,
+                        };
                         request.AddHeader("x-api-key", apiKey);
-                        request.AddParameter("address", address);
-                        IRestResponse response = client.Execute(request);
+                        //адрес теперь надо писать в теле, а не в параметрах
+                        request.AddStringBody($"{{ \"address\": \"{address}\" }}", ContentType.Json);
+
+                        var response = client.Execute(request);
                         if (response.StatusCode == System.Net.HttpStatusCode.OK)
                         {
                             var resultObj = JsonSerializer.Deserialize<ResponseDto>(response.Content);
