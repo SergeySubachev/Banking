@@ -80,7 +80,13 @@ namespace APIClient
                         {
                             string msg = $"Ошибка {(int)response.StatusCode} - {response.StatusCode}";
                             (sheet.Cells[row, 3] as Microsoft.Office.Interop.Excel.Range).Value2 = msg;
-                            Console.Out.WriteLine(msg);
+                            //Console.Out.WriteLine(msg);
+                            var e = response.ErrorException;
+                            while (e != null)
+                            {
+                                Console.Out.WriteLine(e.Message);
+                                e = e.InnerException;
+                            }
                         }
                     }
 
