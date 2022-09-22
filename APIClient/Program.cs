@@ -30,7 +30,7 @@ namespace APIClient
             try
             {
                 //в новой версии Url надо писать и в запросе.
-                string resourceUrl = "https://api.explorer.debex.ru/production/jurisdiction";
+                string resourceUrl = "https://api-yc.explorer.debex.ru/production/jurisdiction";
                 var client = new RestClient(resourceUrl);
                 excelApp = new Microsoft.Office.Interop.Excel.Application();
                 var wb = excelApp.Workbooks.Open(excelFileName, false, false);
@@ -62,31 +62,44 @@ namespace APIClient
                         request.AddStringBody($"{{ \"address\": \"{address}\" }}", ContentType.Json);
 
                         var response = client.Execute(request);
-                        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+
+                        void writeErrorMessage(string msg)
                         {
-                            var resultObj = JsonSerializer.Deserialize<ResponseDto>(response.Content);
-                            for (int i = 0; i < dtoProps.Length; i++)
-                            {
-                                var val = dtoProps[i].GetValue(resultObj.Result.Court);
-                                if (val != null)
-                                {
-                                    (sheet.Cells[row, 3 + i] as Microsoft.Office.Interop.Excel.Range).NumberFormat = "@";
-                                    (sheet.Cells[row, 3 + i] as Microsoft.Office.Interop.Excel.Range).Value2 = val.ToString();
-                                }
-                            }
-                            Console.Out.WriteLine("OK");
-                        }
-                        else
-                        {
-                            string msg = $"Ошибка {(int)response.StatusCode} - {response.StatusCode}";
                             (sheet.Cells[row, 3] as Microsoft.Office.Interop.Excel.Range).Value2 = msg;
-                            //Console.Out.WriteLine(msg);
+                            Console.Out.WriteLine(msg);
                             var e = response.ErrorException;
                             while (e != null)
                             {
                                 Console.Out.WriteLine(e.Message);
                                 e = e.InnerException;
                             }
+                        }
+
+                        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                        {
+                            var resultObj = JsonSerializer.Deserialize<ResponseDto>(response.Content);
+                            if (resultObj.Result is null)
+                            {
+                                writeErrorMessage(string.IsNullOrEmpty(response.Content) ? "error" : response.Content);
+                            }
+                            else
+                            {
+                                for (int i = 0; i < dtoProps.Length; i++)
+                                {
+                                    var val = dtoProps[i].GetValue(resultObj.Result.Court);
+                                    if (val != null)
+                                    {
+                                        (sheet.Cells[row, 3 + i] as Microsoft.Office.Interop.Excel.Range).NumberFormat = "@";
+                                        (sheet.Cells[row, 3 + i] as Microsoft.Office.Interop.Excel.Range).Value2 = val.ToString();
+                                    }
+                                }
+                                Console.Out.WriteLine("OK");
+                            }
+                        }
+                        else
+                        {
+                            string msg = $"Ошибка {(int)response.StatusCode} - {response.StatusCode}";
+                            writeErrorMessage(msg);
                         }
                     }
 
